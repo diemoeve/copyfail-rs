@@ -1,4 +1,7 @@
-use copyfail_rs::detect::check::{run_check_with_sources, CheckSources, ConfigState, Verdict};
+use copyfail_rs::detect::check::{
+    host_appears_vulnerable_with_sources, run_check_with_sources, CheckSources, ConfigState,
+    Verdict,
+};
 use std::ffi::CString;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -179,6 +182,110 @@ fn unknown_when_config_unreadable() {
     let r = run_check_with_sources(&f.sources()).unwrap();
     assert_eq!(r.config_aead, ConfigState::Unknown);
     assert_eq!(r.verdict, Verdict::Unknown);
+}
+
+// ---- Pre-exploit gate (host_appears_vulnerable_with_sources) ----
+//
+// Regression coverage for issue #1 (RHEL 9 false negative). The simple S1
+// check_kernel() returns false on builtin (=y) kernels because algif_aead
+// is not in /proc/modules and authencesn template is lazy-instantiated.
+// The new gate consults the detect-mode verdict, which reads /boot/config-*.
+
+#[test]
+fn gate_true_on_rhel9_builtin_with_lazy_template() {
+    // The exact RHEL 9 fingerprint from issue #1: =y, no module, no template.
+    let f = Fixture::new("gate_rhel9");
+    fs::write(&f.proc_modules, b"foo 4096 0 - Live 0x0\n").unwrap();
+    fs::write(&f.proc_crypto, b"name : crct10dif\n").unwrap();
+    fs::write(&f.boot_config, b"CONFIG_CRYPTO_USER_API_AEAD=y\n").unwrap();
+
+    assert!(
+        host_appears_vulnerable_with_sources(&f.sources()),
+        "RHEL 9 (=y, no module loaded, template not yet instantiated) must gate as VULNERABLE"
+    );
+}
+
+#[test]
+fn gate_true_on_module_loaded() {
+    let f = Fixture::new("gate_module_loaded");
+    fs::write(
+        &f.proc_modules,
+        b"algif_aead 16384 0 - Live 0x0000000000000000\n",
+    )
+    .unwrap();
+    fs::write(&f.proc_crypto, b"").unwrap();
+    fs::write(&f.boot_config, b"CONFIG_CRYPTO_USER_API_AEAD=m\n").unwrap();
+
+    assert!(host_appears_vulnerable_with_sources(&f.sources()));
+}
+
+#[test]
+fn gate_false_when_mitigated() {
+    let f = Fixture::new("gate_mitigated");
+    fs::write(&f.proc_modules, b"foo 4096 0 - Live 0x0\n").unwrap();
+    fs::write(&f.proc_crypto, b"").unwrap();
+    fs::write(&f.boot_config, b"CONFIG_CRYPTO_USER_API_AEAD=m\n").unwrap();
+    fs::write(
+        f.modprobe_d.join("disable-algif.conf"),
+        b"install algif_aead /bin/false\n",
+    )
+    .unwrap();
+
+    assert!(!host_appears_vulnerable_with_sources(&f.sources()));
+}
+
+#[test]
+fn gate_false_when_config_n() {
+    let f = Fixture::new("gate_n");
+    fs::write(&f.proc_modules, b"").unwrap();
+    fs::write(&f.proc_crypto, b"").unwrap();
+    fs::write(
+        &f.boot_config,
+        b"# CONFIG_CRYPTO_USER_API_AEAD is not set\n",
+    )
+    .unwrap();
+
+    assert!(!host_appears_vulnerable_with_sources(&f.sources()));
+}
+
+#[test]
+fn gate_legacy_fallback_when_unknown_with_module_loaded() {
+    // /boot/config-* unreadable (container, locked-down kernel) but module
+    // present, gate must still return true via legacy OR-of-signals.
+    let f = Fixture::new("gate_unknown_module");
+    fs::write(
+        &f.proc_modules,
+        b"algif_aead 16384 0 - Live 0x0000000000000000\n",
+    )
+    .unwrap();
+    fs::write(&f.proc_crypto, b"").unwrap();
+    // boot_config NOT written
+
+    assert!(host_appears_vulnerable_with_sources(&f.sources()));
+}
+
+#[test]
+fn gate_legacy_fallback_when_unknown_with_template_present() {
+    let f = Fixture::new("gate_unknown_template");
+    fs::write(&f.proc_modules, b"").unwrap();
+    fs::write(
+        &f.proc_crypto,
+        b"name : authencesn(hmac(sha256),cbc(aes))\n",
+    )
+    .unwrap();
+    // boot_config NOT written
+
+    assert!(host_appears_vulnerable_with_sources(&f.sources()));
+}
+
+#[test]
+fn gate_false_when_unknown_and_no_signals() {
+    let f = Fixture::new("gate_unknown_clean");
+    fs::write(&f.proc_modules, b"foo 4096 0 - Live 0x0\n").unwrap();
+    fs::write(&f.proc_crypto, b"name : crct10dif\n").unwrap();
+    // boot_config NOT written
+
+    assert!(!host_appears_vulnerable_with_sources(&f.sources()));
 }
 
 #[test]

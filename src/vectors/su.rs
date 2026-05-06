@@ -34,8 +34,10 @@ impl Vector for SuVector {
                 return Ok(false);
             }
         }
-        let kst = crate::check::check_kernel()?;
-        Ok(kst.algif_aead_module || kst.authencesn_template)
+        // Use detect-mode verdict. Handles CONFIG_CRYPTO_USER_API_AEAD=y
+        // (built-in) hosts where /proc/modules reports algif_aead absent and
+        // /proc/crypto's authencesn template is lazy-instantiated.
+        Ok(crate::detect::check::host_appears_vulnerable())
     }
 
     fn execute(&self, primitive: &mut CopyFail) -> Result<(), Error> {

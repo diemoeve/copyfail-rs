@@ -2,7 +2,9 @@
 #![no_main]
 
 use copyfail_rs::detect::baseline::{diff_baseline, write_baseline};
-use copyfail_rs::detect::check::{run_check_with_sources, CheckSources, Verdict};
+use copyfail_rs::detect::check::{
+    host_appears_vulnerable, run_check_with_sources, CheckSources, Verdict,
+};
 use copyfail_rs::detect::hunt::run_hunt;
 use copyfail_rs::detect::output::{
     check_human, check_json, diff_human, scan_human, scan_json, OUT_BUF,
@@ -371,14 +373,14 @@ fn run_exploit(args: &Args) -> i32 {
     }
 }
 
-// Quick host-vuln gate. Conservative: require either the algif_aead module
-// loaded OR the authencesn template visible in /proc/crypto. Mirrors the
-// existing su/passwd applicable() preconditions.
+// Host-vuln gate. Delegates to the detect-mode verdict, which reads
+// /boot/config-$(uname -r). This catches CONFIG_CRYPTO_USER_API_AEAD=y
+// (built-in) hosts where /proc/modules and lazy-instantiated /proc/crypto
+// would otherwise both report absent (RHEL 9 et al.). Falls back to the
+// legacy OR-of-signals when the verdict is Unknown, so containers and
+// locked-down hosts behave like the prior release.
 fn host_kernel_appears_vulnerable() -> bool {
-    match check_kernel() {
-        Ok(s) => s.algif_aead_module || s.authencesn_template,
-        Err(_) => false,
-    }
+    host_appears_vulnerable()
 }
 
 // ----- --vector list ------------------------------------------------------
