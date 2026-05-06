@@ -147,7 +147,7 @@ pub fn select_vector(vectors: &[&dyn Vector]) -> Option<usize> {
 pub enum AttemptOutcome {
     Skipped,    // applicable() returned Ok(false)
     ProbeError, // applicable() returned Err(_)
-    ExecuteOk,  // execute() returned Ok(()) — bypass active
+    ExecuteOk,  // execute() returned Ok(()), bypass active
     ExecuteErr, // execute() returned Err(_)
 }
 

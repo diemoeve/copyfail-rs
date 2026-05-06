@@ -1,5 +1,5 @@
 /*
- * copyfail-rs payload — x86_64
+ * copyfail-rs payload: x86_64
  *
  * setgid(0); setuid(0); execve("/bin/sh", ["sh", NULL], NULL)
  *

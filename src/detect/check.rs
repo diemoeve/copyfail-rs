@@ -245,7 +245,7 @@ fn grep_config_streaming(path: &CStr) -> ConfigState {
                     if let Some(cs) = parse_config_line(&line_buf) {
                         found = cs;
                         line_buf.clear();
-                        // Found — short-circuit
+                        // Found, short-circuit
                         close_fd(fd);
                         return found;
                     }

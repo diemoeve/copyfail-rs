@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vm-snapshot.sh — capture a known-good baseline for cache-vs-disk diff testing.
+# vm-snapshot.sh, capture a known-good baseline for cache-vs-disk diff testing.
 # Run on the test VM BEFORE running the exploit. Stored hashes used by
 # detection mode and post-exploit analysis to confirm what changed.
 
@@ -25,7 +25,7 @@ CRITICAL=(
 )
 
 {
-    echo "# CopyFail baseline — $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+    echo "# CopyFail baseline, $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
     echo "# Host: $(hostname)"
     echo "# Kernel: $(uname -r)"
     echo

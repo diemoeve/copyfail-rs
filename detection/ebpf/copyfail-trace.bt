@@ -1,5 +1,5 @@
 #!/usr/bin/env bpftrace
-// CopyFail (CVE-2026-31431) — AF_ALG aead-bind tracer
+// CopyFail (CVE-2026-31431), AF_ALG aead-bind tracer
 //
 // Run as root: bpftrace copyfail-trace.bt
 // Logs every AF_ALG socket creation and any subsequent bind-with-name
@@ -7,7 +7,7 @@
 // in-place page-cache primitive in mainline kernels < a664bf3d603d).
 
 BEGIN {
-    printf("CopyFail eBPF tracer — Ctrl-C to stop\n");
+    printf("CopyFail eBPF tracer, Ctrl-C to stop\n");
     printf("%-8s %-16s %-6s %-6s %s\n", "TIME", "COMM", "PID", "UID", "EVENT");
 }
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vm-check.sh — pre-flight diagnostic for a target Linux host.
+# vm-check.sh, pre-flight diagnostic for a target Linux host.
 # Reports CopyFail (CVE-2026-31431) vulnerability status without firing exploit.
 # Run on the target VM directly, or via SSH wrapper.
 
@@ -44,7 +44,7 @@ if lsmod | grep -q '^algif_aead'; then
     green "  algif_aead module: LOADED"
     AEAD_LOADED=yes
 else
-    yellow "  algif_aead module: not loaded — will autoload on first AF_ALG aead bind"
+    yellow "  algif_aead module: not loaded, will autoload on first AF_ALG aead bind"
     AEAD_LOADED=no
 fi
 echo
@@ -88,9 +88,9 @@ bold "--- Critical files (detection targets) ---"
 for f in /usr/bin/su /etc/passwd /etc/pam.d/sudo /etc/pam.d/system-auth /etc/pam.d/common-auth /etc/sudoers /etc/ld.so.preload; do
     if [ -e "$f" ]; then
         STAT=$(stat -c '%A %U:%G %s' "$f" 2>/dev/null)
-        echo "  $f — $STAT"
+        echo "  $f, $STAT"
     else
-        echo "  $f — absent"
+        echo "  $f, absent"
     fi
 done
 echo

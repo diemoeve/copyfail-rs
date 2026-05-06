@@ -8,7 +8,7 @@ fn payload_is_present() {
     if cfg!(any(target_arch = "x86_64", target_arch = "aarch64")) {
         assert!(
             !PAYLOAD.is_empty(),
-            "payload not embedded — build payloads/<arch>.bin first"
+            "payload not embedded, build payloads/<arch>.bin first"
         );
     }
 }
@@ -47,7 +47,7 @@ fn payload_length_is_4byte_aligned() {
     assert_eq!(
         PAYLOAD.len() % 4,
         0,
-        "payload {} bytes is not 4-byte aligned — pad payload-<arch>.S",
+        "payload {} bytes is not 4-byte aligned, pad payload-<arch>.S",
         PAYLOAD.len()
     );
 }

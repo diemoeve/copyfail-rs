@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# CopyFail (CVE-2026-31431) — apply 2-line modprobe mitigation
+# CopyFail (CVE-2026-31431), apply 2-line modprobe mitigation
 #
 # Effective ONLY when CONFIG_CRYPTO_USER_API_AEAD=m (loadable module).
 # If your kernel was built with =y (built-in), this script will warn and
@@ -22,14 +22,14 @@ if [ -r "$CONFIG" ]; then
             exit 2
             ;;
         m)
-            echo "OK: CONFIG_CRYPTO_USER_API_AEAD=m — mitigation will be effective"
+            echo "OK: CONFIG_CRYPTO_USER_API_AEAD=m, mitigation will be effective"
             ;;
         "")
             echo "WARNING: CONFIG_CRYPTO_USER_API_AEAD not found in $CONFIG"
             echo "Proceeding anyway; verify after with: lsmod | grep algif_aead"
             ;;
         *)
-            echo "WARNING: unexpected config value '$state' — proceeding"
+            echo "WARNING: unexpected config value '$state', proceeding"
             ;;
     esac
 else

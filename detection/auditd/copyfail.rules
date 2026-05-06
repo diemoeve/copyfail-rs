@@ -1,4 +1,4 @@
-# CopyFail (CVE-2026-31431) detection — load with: auditctl -R copyfail.rules
+# CopyFail (CVE-2026-31431) detection, load with: auditctl -R copyfail.rules
 # Or copy to /etc/audit/rules.d/ and run: augenrules --load
 #
 # AF_ALG = 38 (0x26), SOCK_SEQPACKET = 5 (0x05)

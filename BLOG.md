@@ -21,7 +21,7 @@ Single static `no_std` Rust binary. ~85 KB stripped musl. Runs anywhere Linux.
 $ copyfail-rs --mode detect --diff /etc/pam.d/common-auth
 [CACHE-ONLY (CopyFail signature)] /etc/pam.d/common-auth
   current_disk:  117dab1c... (UNCHANGED, what AIDE / Wazuh / Tripwire see)
-  current_cache: 23c4f1ee... (CHANGED , the actual loaded code)
+  current_cache: 23c4f1ee... (CHANGED, the actual loaded code)
 ```
 
 The disk hash and the cache hash diverging is the CopyFail fingerprint. No other public tool surfaces this.

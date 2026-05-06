@@ -218,7 +218,7 @@ fn line_contains(line: &[u8], needle: &[u8]) -> bool {
     line.windows(needle.len()).any(|w| w == needle)
 }
 
-// FIX 2 (idempotent re-run): detect a `#aut\trequisite ... pam_deny.so` line —
+// FIX 2 (idempotent re-run): detect a `#aut\trequisite ... pam_deny.so` line,
 // the result of a prior killshot in the page cache. Returns the absolute
 // offset of the `#` byte if present, None otherwise.
 //
@@ -243,7 +243,7 @@ pub fn find_pam_deny_killshot_offset(content: &[u8]) -> Option<usize> {
         if rest.len() > 4 && &rest[..4] == b"#aut" {
             // Reviewer M1: tighten to `\t` only. The killshot replaces `auth`
             // with `#aut` inside the canonical `auth\trequisite\t\t\tpam_deny.so`
-            // line — the byte after `#aut` is therefore always a tab. This
+            // line, the byte after `#aut` is therefore always a tab. This
             // rejects hand-written comments like `#aut something requisite ...
             // pam_deny.so` that would otherwise false-positive.
             if rest[4] == b'\t'

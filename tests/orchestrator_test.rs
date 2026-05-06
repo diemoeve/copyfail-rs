@@ -24,7 +24,7 @@ impl Vector for MockVector {
     }
     fn execute(&self, _: &mut CopyFail) -> Result<(), Error> {
         panic!(
-            "MockVector::execute called via trait — orchestrator must use the closure-based runner"
+            "MockVector::execute called via trait, orchestrator must use the closure-based runner"
         )
     }
 }
@@ -83,7 +83,7 @@ fn build_plan_reports_applicability_per_vector() {
 
 #[test]
 fn build_plan_does_not_call_execute() {
-    // MockVector panics on execute — this proves build_plan never invokes it.
+    // MockVector panics on execute, this proves build_plan never invokes it.
     let pam = mk("pam", Ok(true));
     let su = mk("su", Ok(true));
     let vectors: &[&dyn Vector] = &[&pam, &su];

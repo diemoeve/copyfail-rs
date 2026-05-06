@@ -54,7 +54,7 @@ jobs:
             ~/.cargo/git
             target
           key: test-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
-      - name: Run tests (native x86_64-linux-gnu — runner can execute these)
+      - name: Run tests (native x86_64-linux-gnu, runner can execute these)
         run: cargo test --release
 
   build-musl:

@@ -97,7 +97,7 @@ impl CopyFail {
             write_cmsg_hdr(p, OP_PAYLOAD, SOL_ALG, ALG_SET_OP);
             ptr::write_unaligned(p.add(CMSG_HDR_SIZE) as *mut u32, ALG_OP_DECRYPT);
 
-            // cmsg 2: ALG_SET_IV — struct af_alg_iv { u32 ivlen; u8 iv[16] }
+            // cmsg 2: ALG_SET_IV, struct af_alg_iv { u32 ivlen; u8 iv[16] }
             let p2 = p.add(CMSG_OP_SPACE);
             write_cmsg_hdr(p2, IV_PAYLOAD, SOL_ALG, ALG_SET_IV);
             ptr::write_unaligned(p2.add(CMSG_HDR_SIZE) as *mut u32, IV_LEN);

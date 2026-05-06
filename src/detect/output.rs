@@ -31,7 +31,7 @@ pub fn check_human(r: &CheckReport, out: &mut String<OUT_BUF>) {
     if r.config_y_warning {
         let _ = writeln!(
             out,
-            "WARNING:       CONFIG_CRYPTO_USER_API_AEAD=y — modprobe blacklist BYPASSED"
+            "WARNING:       CONFIG_CRYPTO_USER_API_AEAD=y, modprobe blacklist BYPASSED"
         );
     }
     let _ = writeln!(out);
@@ -126,7 +126,7 @@ pub fn scan_human(r: &ScanReport, out: &mut String<OUT_BUF>) {
             .iter()
             .filter(|e| e.verdict == FileVerdict::Skipped)
         {
-            let _ = writeln!(out, "  {} — {}", e.path.as_str(), e.note.as_str());
+            let _ = writeln!(out, "  {}, {}", e.path.as_str(), e.note.as_str());
         }
     }
 
@@ -134,13 +134,13 @@ pub fn scan_human(r: &ScanReport, out: &mut String<OUT_BUF>) {
         let _ = writeln!(out);
         let _ = writeln!(out, "ERRORS ({}):", n_err);
         for e in r.entries.iter().filter(|e| e.verdict == FileVerdict::Error) {
-            let _ = writeln!(out, "  {} — {}", e.path.as_str(), e.note.as_str());
+            let _ = writeln!(out, "  {}, {}", e.path.as_str(), e.note.as_str());
         }
     }
 
     let _ = writeln!(out);
     if n_tamp > 0 {
-        let _ = writeln!(out, "VERDICT:   TAMPERING DETECTED — investigate");
+        let _ = writeln!(out, "VERDICT:   TAMPERING DETECTED, investigate");
     } else if n_clean == r.entries.len() {
         let _ = writeln!(out, "VERDICT:   CLEAN");
     } else {
@@ -191,7 +191,7 @@ pub fn diff_human<const N: usize>(diffs: &heapless::Vec<DiffEntry, N>, out: &mut
             DiffKind::CacheTampered => "CACHE-ONLY (CopyFail signature)",
             DiffKind::BothChanged => "BOTH CHANGED",
             DiffKind::Missing => "MISSING / UNREADABLE",
-            DiffKind::SkippedTmpfs => "SKIPPED (tmpfs — no on-disk view)",
+            DiffKind::SkippedTmpfs => "SKIPPED (tmpfs, no on-disk view)",
         };
         let _ = writeln!(out, "  [{}] {}", kind, d.path.as_str());
         if !matches!(d.kind, DiffKind::Missing | DiffKind::SkippedTmpfs) {

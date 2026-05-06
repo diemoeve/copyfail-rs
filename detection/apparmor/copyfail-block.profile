@@ -1,4 +1,4 @@
-# AppArmor profile fragment — block AF_ALG for unprivileged processes
+# AppArmor profile fragment: block AF_ALG for unprivileged processes
 #
 # Install: cp this file to /etc/apparmor.d/copyfail-block, then
 #   apparmor_parser -r /etc/apparmor.d/copyfail-block

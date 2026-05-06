@@ -1,4 +1,4 @@
-title: CopyFail Exploit Attempt — AF_ALG AEAD Socket
+title: CopyFail Exploit Attempt: AF_ALG AEAD Socket
 id: 4e1511d9-e58d-4348-9f0a-e07fae3de4d2
 description: >
   Detects creation of AF_ALG socket with type=aead by a non-root process.

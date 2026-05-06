@@ -1,8 +1,8 @@
 #!/bin/sh
-# copyfail-pwn.sh — thin wrapper around the single-binary CopyFail demo.
+# copyfail-pwn.sh: thin wrapper around the single-binary CopyFail demo.
 #
 # As of S2.7 the binary itself drops the operator into a root shell when run
-# from a TTY — this wrapper exists for backwards compatibility with anything
+# from a TTY, this wrapper exists for backwards compatibility with anything
 # that was calling the script directly. New users should just run the binary:
 #
 #     ./copyfail-rs --mode exploit
