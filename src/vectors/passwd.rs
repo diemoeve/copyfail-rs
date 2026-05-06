@@ -123,8 +123,10 @@ impl Vector for PasswdVector {
                 return Ok(false);
             }
         }
-        let st = crate::check::check_kernel()?;
-        Ok(st.algif_aead_module || st.authencesn_template)
+        // Use detect-mode verdict. Handles CONFIG_CRYPTO_USER_API_AEAD=y
+        // (built-in) hosts where /proc/modules reports algif_aead absent and
+        // /proc/crypto's authencesn template is lazy-instantiated.
+        Ok(crate::detect::check::host_appears_vulnerable())
     }
 
     fn execute(&self, primitive: &mut CopyFail) -> Result<(), Error> {

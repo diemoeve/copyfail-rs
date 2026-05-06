@@ -1,6 +1,6 @@
 [package]
 name = "copyfail-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "CVE-2026-31431 (CopyFail) — multi-vector exploit + cache-vs-disk detection"
 license = "MIT OR Apache-2.0"

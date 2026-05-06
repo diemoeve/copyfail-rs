@@ -55,6 +55,48 @@ pub struct CheckReport {
     pub config_y_warning: bool,
 }
 
+/// Pre-exploit gate. True when the binary should attempt vector chain.
+///
+/// Uses the detect-mode verdict (which reads `/boot/config-$(uname -r)`) so
+/// `CONFIG_CRYPTO_USER_API_AEAD=y` (built-in) hosts are correctly classified
+/// vulnerable. Falls back to the legacy OR-of-signals (algif_aead module
+/// loaded OR authencesn template registered) when the verdict is Unknown,
+/// which preserves prior behaviour on containers / locked-down hosts where
+/// /boot/config-* is unreadable.
+pub fn host_appears_vulnerable_with_sources(sources: &CheckSources<'_>) -> bool {
+    if let Ok(report) = run_check_with_sources(sources) {
+        match report.verdict {
+            Verdict::Vulnerable => return true,
+            Verdict::Mitigated | Verdict::NotExploitable => return false,
+            Verdict::Unknown => {} // fall through to legacy probe
+        }
+    }
+    let modules = read_file_buf(sources.proc_modules).unwrap_or(([0u8; READ_BUF], 0));
+    if scan_loaded_module(&modules.0[..modules.1]) {
+        return true;
+    }
+    let crypto = read_file_buf(sources.proc_crypto).unwrap_or(([0u8; READ_BUF], 0));
+    contains(&crypto.0[..crypto.1], b"authencesn(")
+}
+
+/// Pre-exploit gate against the real host filesystem.
+pub fn host_appears_vulnerable() -> bool {
+    if let Ok(report) = run_check() {
+        match report.verdict {
+            Verdict::Vulnerable => return true,
+            Verdict::Mitigated | Verdict::NotExploitable => return false,
+            Verdict::Unknown => {}
+        }
+    }
+    let real = CheckSources::real();
+    let modules = read_file_buf(real.proc_modules).unwrap_or(([0u8; READ_BUF], 0));
+    if scan_loaded_module(&modules.0[..modules.1]) {
+        return true;
+    }
+    let crypto = read_file_buf(real.proc_crypto).unwrap_or(([0u8; READ_BUF], 0));
+    contains(&crypto.0[..crypto.1], b"authencesn(")
+}
+
 pub fn run_check() -> Result<CheckReport, Error> {
     let real = CheckSources::real();
     let kernel_release = read_trimmed::<KERNEL_MAX>(real.osrelease)?;
